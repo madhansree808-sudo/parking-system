@@ -32,6 +32,7 @@ This project delivers a complete, full-stack, enterprise-grade software solution
 1. **Java Core Application**: High-performance, object-oriented, menu-driven CLI that orchestrates slot management, vehicle entry, automated nearest slot allocation, exit processing, tiered tariff calculation, and operational reporting.
 2. **Database Management System (SQLite)**: Fully normalized (3NF / BCNF) relational database schema with referential integrity, automated triggers, views, and optimized indexing.
 3. **Python Data Science Module**: Connects to the database, extracts operational datasets, performs cleaning and feature engineering using **Pandas** and **NumPy**, and produces exploratory visualizations using **Matplotlib** and **Seaborn** to discover occupancy trends, vehicle demographics, and peak parking hours.
+4. **Interactive Web Portal & Dashboard**: Responsive web application with a real-time visual parking bay grid, automated ticket generation, checkout billing calculator, and visual analytics gallery.
 
 ---
 
@@ -257,6 +258,18 @@ jupyter notebook python_analytics/parking_analysis.ipynb
 
 ---
 
+### Step 5: Launch the Interactive Web Dashboard
+The web dashboard is fully self-contained with no external server dependencies:
+* **Option A (Instant Direct Launch)**: Simply double-click [`web/index.html`](web/index.html) to open in your default browser.
+* **Option B (Local Web Server)**:
+  ```bash
+  cd "d:\project 2"
+  python -m http.server 8000 --directory web
+  ```
+  Then navigate to `http://localhost:8000` in Chrome/Edge/Firefox.
+
+---
+
 ## 🧪 Testing and Validation Summary
 
 The system was verified against 23 formal test cases covering Unit, Integration, and System levels:
@@ -268,6 +281,7 @@ The system was verified against 23 formal test cases covering Unit, Integration,
 ---
 
 ## 📖 Deliverables Cross-Reference
+* **Interactive Web Dashboard**: [`web/index.html`](web/index.html)
 * **Software Requirements Specification (SRS)**: [`docs/SRS.md`](docs/SRS.md)
 * **System Design Diagrams & UML**: [`docs/DESIGN_DIAGRAMS.md`](docs/DESIGN_DIAGRAMS.md)
 * **Database Design & Normalization**: [`docs/DATABASE_DESIGN.md`](docs/DATABASE_DESIGN.md)
