@@ -1,0 +1,9 @@
+# Python Data Science & Visualization Dependencies
+# Course: 25ITC31 - Foundations of Data Science
+# Velalar College of Engineering and Technology, Erode - 12
+
+pandas>=1.5.0
+numpy>=1.23.0
+matplotlib>=3.6.0
+seaborn>=0.12.0
+ipykernel>=6.0.0
