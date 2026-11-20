@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SQL Queries – Smart Parking System (Scenario 24)</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { margin: 0; background: #f1f5f9; color: #1e293b; }
+    header {
+      background: #0f172a; color: #fff;
+      padding: 18px 28px;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+    }
+    header h1 { margin: 0; font-size: 1.15rem; }
+    header p  { margin: 4px 0 0; font-size: 0.82rem; color: #94a3b8; }
+    .student  { font-size: 0.8rem; color: #cbd5e1; margin-top: 5px; }
+    .nav-btn  { background: #2563eb; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; text-decoration: none; }
+    .nav-btn:hover { background: #1d4ed8; }
+
+    .container { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
+    h2 { font-size: 1rem; color: #64748b; margin: 32px 0 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .section { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); margin-bottom: 28px; overflow: hidden; }
+    .section-header { background: #1e293b; color: #f8fafc; padding: 12px 18px; }
+    .section-header h3 { margin: 0; font-size: 0.95rem; }
+    .section-header span { font-size: 0.78rem; color: #94a3b8; margin-top: 2px; display: block; }
+    .query-box { background: #0f172a; padding: 14px 18px; overflow-x: auto; }
+    .query-box pre { margin: 0; color: #7dd3fc; font-size: 0.88rem; line-height: 1.6; }
+    .kw  { color: #f472b6; }   /* SQL keywords */
+    .fn  { color: #34d399; }   /* functions */
+    .str { color: #fbbf24; }   /* strings/values */
+    .cmt { color: #64748b; }   /* comments */
+
+    .result { padding: 14px 18px; overflow-x: auto; }
+    .result p { margin: 0 0 8px; font-size: 0.82rem; color: #64748b; font-style: italic; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th { background: #f8fafc; color: #334155; padding: 9px 12px; border-bottom: 2px solid #e2e8f0; text-align: left; white-space: nowrap; }
+    td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f8fafc; }
+    .badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+    .avail  { background: #dcfce7; color: #166534; }
+    .occ    { background: #fee2e2; color: #991b1b; }
+    .maint  { background: #fef3c7; color: #92400e; }
+    .paid   { background: #dbeafe; color: #1e40af; }
+    .active { background: #d1fae5; color: #065f46; }
+
+    footer { text-align: center; padding: 24px; color: #94a3b8; font-size: 0.82rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Velalar College of Engineering and Technology (Autonomous)</h1>
+    <p>Dept. of IT · Scenario 24: Smart Parking Management &amp; Usage Analysis System · 25ITC31</p>
+    <div class="student">👤 Madhan sree &nbsp;|&nbsp; Roll: 732925ITR054 &nbsp;|&nbsp; Reg No: 54 &nbsp;|&nbsp; Class: 25IT3A</div>
+  </div>
+  <a href="index.html" class="nav-btn">← Back to Dashboard</a>
+</header>
+
+<div class="container">
+
+  <h2>📋 SQL Query Reference — All Queries with Sample Output</h2>
+
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <!-- Q1 -->
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <h3>Q1 · View All Parking Areas</h3>
+      <span>Retrieve all parking zones with their total slot capacity</span>
+    </div>
+    <div class="query-box"><pre><span class="kw">SELECT</span>  area_id,
+        area_name,
+        location,
+        total_slots,
+        area_type
+<span class="kw">FROM</span>    parking_areas
+<span class="kw">ORDER BY</span> area_id;</pre></div>
+    <div class="result">
+      <p>▶ Sample Output (4 rows)</p>
+      <table>
+        <thead><tr><th>area_id</th><th>area_name</th><th>location</th><th>total_slots</th><th>area_type</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Block A – Main Gate</td><td>North Wing</td><td>10</td><td>Open</td></tr>
+          <tr><td>2</td><td>Block B – Admin Block</td><td>East Wing</td><td>10</td><td>Covered</td></tr>
+          <tr><td>3</td><td>Block C – Canteen Side</td><td>South Wing</td><td>10</td><td>Open</td></tr>
+          <tr><td>4</td><td>Block D – EV Zone</td><td>West Wing</td><td>10</td><td>EV Charging</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="section">
+    <div class="section-header">
+      <h3>Q2 · List All Parking Slots with Status</h3>
+      <span>Show every slot across all blocks with current availability</span>
+    </div>
+    <div class="query-box"><pre><span class="kw">SELECT</span>  s.slot_id,
+        a.area_name,
+        s.slot_number,
+        s.slot_type,
+        s.status,
+        s.floor_level
+<span class="kw">FROM</span>    parking_slots s
+<span class="kw">JOIN</span>    parking_areas a <span class="kw">ON</span> s.area_id = a.area_id
+<span class="kw">ORDER BY</span> s.slot_id
+<span class="kw">LIMIT</span>   <span class="str">10</span>;</pre></div>
+    <div class="result">
+      <p>▶ Sample Output (first 10 of 40 rows)</p>
+      <table>
+        <thead><tr><th>slot_id</th><th>area_name</th><th>slot_number</th><th>slot_type</th><th>status</th><th>floor_level</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Block A – Main Gate</td><td>A-01</td><td>Two-Wheeler</td><td><span class="badge avail">AVAILABLE</span></td><td>G</td></tr>
+          <tr><td>2</td><td>Block A – Main Gate</td><td>A-02</td><td>Two-Wheeler</td><td><span class="badge occ">OCCUPIED</span></td><td>G</td></tr>
+          <tr><td>3</td><td>Block A – Main Gate</td><td>A-03</td><td>Four-Wheeler</td><td><span class="badge avail">AVAILABLE</span></td><td>G</td></tr>
+          <tr><td>4</td><td>Block A – Main Gate</td><td>A-04</td><td>Four-Wheeler</td><td><span class="badge maint">MAINTENANCE</span></td><td>G</td></tr>
+          <tr><td>5</td><td>Block A – Main Gate</td><td>A-05</td><td>Two-Wheeler</td><td><span class="badge avail">AVAILABLE</span></td><td>G</td></tr>
+          <tr><td>6</td><td>Block B – Admin Block</td><td>B-01</td><td>Four-Wheeler</td><td><span class="badge occ">OCCUPIED</span></td><td>G</td></tr>
+          <tr><td>7</td><td>Block B – Admin Block</td><td>B-02</td><td>EV</td><td><span class="badge avail">AVAILABLE</span></td><td>G</td></tr>
+          <tr><td>8</td><td>Block B – Admin Block</td><td>B-03</td><td>Four-Wheeler</td><td><span class="badge avail">AVAILABLE</span></td><td>G</td></tr>
+          <tr><td>9</td><td>Block C – Canteen Side</td><td>C-01</td><td>Heavy</td><td><span class="badge avail">AVAILABLE</span></td><td>G</td></tr>
+          <tr><td>10</td><td>Block D – EV Zone</td><td>D-01</td><td>EV</td><td><span class="badge occ">OCCUPIED</span></td><td>G</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="section">
+    <div class="section-header">
+      <h3>Q3 · Count Slots by Status per Area</h3>
+      <span>Aggregated occupancy summary grouped by parking area</span>
+    </div>
+    <div class="query-box"><pre><span class="kw">SELECT</span>  a.area_name,
+        <span class="fn">COUNT</span>(<span class="kw">CASE WHEN</span> s.status = <span class="str">'AVAILABLE'</span>    <span class="kw">THEN</span> 1 <span class="kw">END</span>) <span class="kw">AS</span> available,
+        <span class="fn">COUNT</span>(<span class="kw">CASE WHEN</span> s.status = <span class="str">'OCCUPIED'</span>     <span class="kw">THEN</span> 1 <span class="kw">END</span>) <span class="kw">AS</span> occupied,
+        <span class="fn">COUNT</span>(<span class="kw">CASE WHEN</span> s.status = <span class="str">'MAINTENANCE'</span>  <span class="kw">THEN</span> 1 <span class="kw">END</span>) <span class="kw">AS</span> maintenance,
+        <span class="fn">COUNT</span>(*) <span class="kw">AS</span> total
+<span class="kw">FROM</span>    parking_slots s
+<span class="kw">JOIN</span>    parking_areas a <span class="kw">ON</span> s.area_id = a.area_id
+<span class="kw">GROUP BY</span> a.area_name
+<span class="kw">ORDER BY</span> a.area_name;</pre></div>
+    <div class="result">
+      <p>▶ Sample Output (4 rows)</p>
+      <table>
+        <thead><tr><th>area_name</th><th>available</th><th>occupied</th><th>maintenance</th><th>total</th></tr></thead>
+        <tbody>
+          <tr><td>Block A – Main Gate</td><td>6</td><td>3</td><td>1</td><td>10</td></tr>
+          <tr><td>Block B – Admin Block</td><td>7</td><td>2</td><td>1</td><td>10</td></tr>
+          <tr><td>Block C – Canteen Side</td><td>8</td><td>2</td><td>0</td><td>10</td></tr>
+          <tr><td>Block D – EV Zone</td><td>5</td><td>4</td><td>1</td><td>10</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="section">
+    <div class="section-header">
+      <h3>Q4 · View All Registered Vehicles</h3>
+      <span>All vehicles stored in the system with their type and owner</span>
+    </div>
+    <div class="query-box"><pre><span class="kw">SELECT</span>  vehicle_id,
+        license_plate,
+        vehicle_type,
+        owner_name,
+        contact_number,
+        registered_at
+<span class="kw">FROM</span>    vehicles
+<span class="kw">ORDER BY</span> registered_at <span class="kw">DESC</span>
+<span class="kw">LIMIT</span>   <span class="str">8</span>;</pre></div>
+    <div class="result">
+      <p>▶ Sample Output (8 rows)</p>
+      <table>
+        <thead><tr><th>vehicle_id</th><th>license_plate</th><th>vehicle_type</th><th>owner_name</th><th>contact_number</th><th>registered_at</th></tr></thead>
+        <tbody>
+          <tr><td>V030</td><td>TN 33 MN 9012</td><td>EV</td><td>Saranya R</td><td>9344567890</td><td>2024-11-10 09:15:00</td></tr>
+          <tr><td>V029</td><td>TN 33 LM 7890</td><td>Heavy</td><td>Pradeep K</td><td>9233456789</td><td>2024-11-09 10:20:00</td></tr>
+          <tr><td>V028</td><td>TN 33 KL 6789</td><td>Four-Wheeler</td><td>Deepa S</td><td>9122345678</td><td>2024-11-08 11:30:00</td></tr>
+          <tr><td>V027</td><td>TN 33 JK 5678</td><td>Two-Wheeler</td><td>Vignesh A</td><td>9011234567</td><td>2024-11-07 08:45:00</td></tr>
+          <tr><td>V026</td><td>TN 33 IJ 4567</td><td>EV</td><td>Kavya M</td><td>8900123456</td><td>2024-11-06 13:00:00</td></tr>
+          <tr><td>V025</td><td>TN 33 HI 3456</td><td>Four-Wheeler</td><td>Ramesh B</td><td>8789012345</td><td>2024-11-05 09:30:00</td></tr>
+          <tr><td>V024</td><td>TN 33 GH 2345</td><td>Two-Wheeler</td><td>Priya N</td><td>8678901234</td><td>2024-11-04 10:15:00</td></tr>
+          <tr><td>V023</td><td>TN 33 FG 1234</td><td>Heavy</td><td>Suresh P</td><td>8567890123</td><td>2024-11-03 11:00:00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="section">
+    <div class="section-header">
+      <h3>Q5 · Active Parking Tickets (Currently Parked)</h3>
+      <span>All open tickets where vehicle has not yet exited</span>
+    </div>
+    <div class="query-box"><pre><span class="kw">SELECT</span>  t.ticket_id,
+        v.license_plate,
+        v.vehicle_type,
+        v.owner_name,
+        s.slot_number,
+        a.area_name,
+        t.entry_time,
+        t.status
+<span class="kw">FROM</span>    parking_tickets t
+<span class="kw">JOIN</span>    vehicles v <span class="kw">ON</span> t.vehicle_id  = v.vehicle_id
+<span class="kw">JOIN</span>    parking_slots s <span class="kw">ON</span> t.slot_id  = s.slot_id
+<span class="kw">JOIN</span>    parking_areas a <span class="kw">ON</span> s.area_id  = a.area_id
+<span class="kw">WHERE</span>   t.status = <span class="str">'ACTIVE'</span>
+<span class="kw">ORDER BY</span> t.entry_time <span class="kw">DESC</span>;</pre></div>
+    <div class="result">
+      <p>▶ Sample Output (5 rows)</p>
+      <table>
+        <thead><tr><th>ticket_id</th><th>license_plate</th><th>vehicle_type</th><th>owner_name</th><th>slot_number</th><th>area_name</th><th>entry_time</th><th>status</th></tr></thead>
+        <tbody>
+          <tr><td>TKT042</td><td>TN 33 MN 9012</td><td>EV</td><td>Saranya R</td><td>D-04</td><td>Block D – EV Zone</td><td>2024-11-10 09:15:00</td><td><span class="badge active">ACTIVE</span></td></tr>
+          <tr><td>TKT041</td><td>TN 33 LM 7890</td><td>Heavy</td><td>Pradeep K</td><td>C-08</td><td>Block C – Canteen Side</td><td>2024-11-09 10:20:00</td><td><span class="badge active">ACTIVE</span></td></tr>
+          <tr><td>TKT040</td><td>TN 33 KL 6789</td><td>Four-Wheeler</td><td>Deepa S</td><td>B-06</td><td>Block B – Admin Block</td><td>2024-11-08 11:30:00</td><td><span class="badge active">ACTIVE</span></td></tr>
+          <tr><td>TKT039</td><td>TN 33 JK 5678</td><td>Two-Wheeler</td><td>Vignesh A</td><td>A-02</td><td>Block A – Main Gate</td><td>2024-11-07 08:45:00</td><td><span class="badge active">ACTIVE</span></td></tr>
+          <tr><td>TKT038</td><td>TN 33 IJ 4567</td><td>EV</td><td>Kavya M</td><td>D-07</td><td>Block D – EV Zone</td><td>2024-11-06 13:00:00</td><td><span class="badge active">ACTIVE</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="section">
+    <div class="section-header">
+      <h3>Q6 · Calculate Parking Fee for a Ticket</h3>
+      <span>Fee = Base charge + (hourly rate × hours stayed)</span>
+    </div>
+    <div class="query-box"><pre><span class="kw">SELECT</span>  t.ticket_id,
+        v.license_plate,
+        v.vehicle_type,
+        t.entry_time,
+        t.exit_time,
+        <span class="fn">ROUND</span>(
+          (<span class="fn">JULIANDAY</span>(t.exit_time) - <span class="fn">JULIANDAY</span>(t.entry_time)) * <span class="str">24</span>, 2
+        ) <span class="kw">AS</span> hours_stayed,
+        t.fee_amount <span class="kw">AS</span> total_fee_inr
+<span class="kw">FROM</span>    parking_tickets t
+<span class="kw">JOIN</span>    vehicles v <span class="kw">ON</span> t.vehicle_id = v.vehicle_id
+<span class="kw">WHERE</span>   t.status = <span class="str">'PAID'</span>
+<span class="kw">ORDER BY</span> t.exit_time <span class="kw">DESC</span>
+<span class="kw">LIMIT</span>   <span class="str">6</span>;</pre></div>
+    <div class="result">
+      <p>▶ Sample Output (6 rows)</p>
+      <table>
+        <thead><tr><th>ticket_id</th><th>license_plate</th><th>vehicle_type</th><th>entry_time</th><th>exit_time</th><th>hours_stayed</th><th>total_fee_inr</th></tr></thead>
+        <tbody>
+          <tr><td>TKT037</td><td>TN 33 HI 3456</td><td>Four-Wheeler</td><td>2024-11-05 09:30:00</td><td>2024-11-05 13:30:00</td><td>4.00</td><td>₹120.00</td></tr>
+          <tr><td>TKT036</td><td>TN 33 GH 2345</td><td>Two-Wheeler</td><td>2024-11-04 10:15:00</td><td>2024-11-04 12:45:00</td><td>2.50</td><td>₹45.00</td></tr>
+          <tr><td>TKT035</td><td>TN 33 FG 1234</td><td>Heavy</td><td>2024-11-03 11:00:00</td><td>2024-11-03 15:00:00</td><td>4.00</td><td>₹240.00</td></tr>
+          <tr><td>TKT034</td><td>TN 33 EF 0123</td><td>EV</td><td>2024-11-02 08:00:00</td><td>2024-11-02 11:00:00</td><td>3.00</td><td>₹125.00</td></tr>
+          <tr><td>TKT033</td><td>TN 33 DE 9012</td><td>Four-Wheeler</td><td>2024-11-01 09:00:00</td><td>2024-11-01 11:30:00</td><td>2.50</td><td>₹90.00</td></tr>
+          <tr><td>TKT032</td><td>TN 33 CD 8901</td><td>Two-Wheeler</td><td>2024-10-31 10:00:00</td><td>2024-10-31 12:00:00</td><td>2.00</td><td>₹40.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="section">
+    <div class="section-header">
+      <h3>Q7 · Total Revenue by Vehicle Type</h3>
+      <span>Aggregated earnings grouped by vehicle category</span>
+    </div>
+    <div class="query-box"><pre><span class="kw">SELECT</span>  v.vehicle_type,
+        <span class="fn">COUNT</span>(t.ticket_id)       <span class="kw">AS</span> total_trips,
+        <span class="fn">SUM</span>(t.fee_amount)         <span class="kw">AS</span> total_revenue_inr,
+        <span class="fn">ROUND</span>(<span class="fn">AVG</span>(t.fee_amount),2) <span class="kw">AS</span> avg_fee_inr
+<span class="kw">FROM</span>    parking_tickets t
+<span class="kw">JOIN</span>    vehicles v <span class="kw">ON</span> t.vehicle_id = v.vehicle_id
+<span class="kw">WHERE</span>   t.status = <span class="str">'PAID'</span>
+<span class="kw">GROUP BY</span> v.vehicle_type
+<span class="kw">ORDER BY</span> total_revenue_inr <span class="kw">DESC</span>;</pre></div>
+    <div class="result">
+      <p>▶ Sample Output (4 rows)</p>
+      <table>
+        <thead><tr><th>vehicle_type</th><th>total_trips</th><th>total_revenue_inr</th><th>avg_fee_inr</th></tr></thead>
+        <tbody>
+          <tr><td>Four-Wheeler</td><td>14</td><td>₹1,540.00</td><td>₹110.00</td></tr>
+          <tr><td>Heavy</td><td>8</td><td>₹1,360.00</td><td>₹170.00</td></tr>
+          <tr><td>EV</td><td>9</td><td>₹1,125.00</td><td>₹125.00</td></tr>
+          <tr><td>Two-Wheeler</td><td>16</td><td>₹680.00</td><td>₹42.50</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="section">
+    <div class="section-header">
+      <h3>Q8 · Find Vehicle by License Plate (Search)</h3>
+      <span>Lookup a specific vehicle and its parking history</span>
+    </div>
+    <div class="query-box"><pre><span class="kw">SELECT</span>  v.vehicle_id,
+        v.license_plate,
+        v.vehicle_type,
+        v.owner_name,
+        v.contact_number,
+        t.ticket_id,
+        t.entry_time,
+        t.exit_time,
+        t.fee_amount,
+        t.status
+<span class="kw">FROM</span>    vehicles v
+<span class="kw">LEFT JOIN</span> parking_tickets t <span class="kw">ON</span> v.vehicle_id = t.vehicle_id
+<span class="kw">WHERE</span>   v.license_plate = <span class="str">'TN 33 AB 1234'</span>
+<span class="kw">ORDER BY</span> t.entry_time <span class="kw">DESC</span>;</pre></div>
+    <div class="result">
+      <p>▶ Sample Output</p>
+      <table>
+        <thead><tr><th>vehicle_id</th><th>license_plate</th><th>vehicle_type</th><th>owner_name</th><th>contact_number</th><th>ticket_id</th><th>entry_time</th><th>exit_time</th><th>fee_amount</th><th>status</th></tr></thead>
+        <tbody>
+          <tr><td>V001</td><td>TN 33 AB 1234</td><td>Two-Wheeler</td><td>Madhan sree</td><td>9876543210</td><td>TKT001</td><td>2024-10-01 09:00:00</td><td>2024-10-01 11:00:00</td><td>₹40.00</td><td><span class="badge paid">PAID</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="section">
+    <div class="section-header">
+      <h3>Q9 · Slots Under Maintenance</h3>
+      <span>All slots flagged for maintenance with area details</span>
+    </div>
+    <div class="query-box"><pre><span class="kw">SELECT</span>  s.slot_id,
+        s.slot_number,
+        a.area_name,
+        s.slot_type,
+        s.floor_level,
+        s.status
+<span class="kw">FROM</span>    parking_slots s
+<span class="kw">JOIN</span>    parking_areas a <span class="kw">ON</span> s.area_id = a.area_id
+<span class="kw">WHERE</span>   s.status = <span class="str">'MAINTENANCE'</span>
+<span class="kw">ORDER BY</span> s.slot_id;</pre></div>
+    <div class="result">
+      <p>▶ Sample Output (3 rows)</p>
+      <table>
+        <thead><tr><th>slot_id</th><th>slot_number</th><th>area_name</th><th>slot_type</th><th>floor_level</th><th>status</th></tr></thead>
+        <tbody>
+          <tr><td>4</td><td>A-04</td><td>Block A – Main Gate</td><td>Four-Wheeler</td><td>G</td><td><span class="badge maint">MAINTENANCE</span></td></tr>
+          <tr><td>14</td><td>B-04</td><td>Block B – Admin Block</td><td>Two-Wheeler</td><td>G</td><td><span class="badge maint">MAINTENANCE</span></td></tr>
+          <tr><td>31</td><td>D-01</td><td>Block D – EV Zone</td><td>EV</td><td>G</td><td><span class="badge maint">MAINTENANCE</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="section">
+    <div class="section-header">
+      <h3>Q10 · Daily Parking Traffic Report</h3>
+      <span>Number of vehicles parked per day with daily revenue</span>
+    </div>
+    <div class="query-box"><pre><span class="kw">SELECT</span>  <span class="fn">DATE</span>(t.entry_time)        <span class="kw">AS</span> parking_date,
+        <span class="fn">COUNT</span>(t.ticket_id)       <span class="kw">AS</span> vehicles_parked,
+        <span class="fn">SUM</span>(t.fee_amount)         <span class="kw">AS</span> daily_revenue_inr
+<span class="kw">FROM</span>    parking_tickets t
+<span class="kw">WHERE</span>   t.status = <span class="str">'PAID'</span>
+<span class="kw">GROUP BY</span> <span class="fn">DATE</span>(t.entry_time)
+<span class="kw">ORDER BY</span> parking_date <span class="kw">DESC</span>
+<span class="kw">LIMIT</span>   <span class="str">7</span>;</pre></div>
+    <div class="result">
+      <p>▶ Sample Output (7 days)</p>
+      <table>
+        <thead><tr><th>parking_date</th><th>vehicles_parked</th><th>daily_revenue_inr</th></tr></thead>
+        <tbody>
+          <tr><td>2024-11-05</td><td>5</td><td>₹550.00</td></tr>
+          <tr><td>2024-11-04</td><td>6</td><td>₹480.00</td></tr>
+          <tr><td>2024-11-03</td><td>4</td><td>₹620.00</td></tr>
+          <tr><td>2024-11-02</td><td>7</td><td>₹700.00</td></tr>
+          <tr><td>2024-11-01</td><td>5</td><td>₹410.00</td></tr>
+          <tr><td>2024-10-31</td><td>6</td><td>₹520.00</td></tr>
+          <tr><td>2024-10-30</td><td>4</td><td>₹380.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Q11 DDL -->
+  <div class="section">
+    <div class="section-header">
+      <h3>Q11 · DDL — CREATE TABLE Statements</h3>
+      <span>Table definitions with primary keys, foreign keys, and constraints</span>
+    </div>
+    <div class="query-box"><pre><span class="cmt">-- Table 1: Parking Areas</span>
+<span class="kw">CREATE TABLE</span> parking_areas (
+    area_id      <span class="fn">INTEGER</span> <span class="kw">PRIMARY KEY AUTOINCREMENT</span>,
+    area_name    <span class="fn">TEXT</span>    <span class="kw">NOT NULL UNIQUE</span>,
+    location     <span class="fn">TEXT</span>    <span class="kw">NOT NULL</span>,
+    total_slots  <span class="fn">INTEGER</span> <span class="kw">DEFAULT</span> <span class="str">0</span>,
+    area_type    <span class="fn">TEXT</span>    <span class="kw">CHECK</span>(area_type <span class="kw">IN</span> (<span class="str">'Open'</span>,<span class="str">'Covered'</span>,<span class="str">'EV Charging'</span>))
+);
+
+<span class="cmt">-- Table 2: Parking Slots</span>
+<span class="kw">CREATE TABLE</span> parking_slots (
+    slot_id     <span class="fn">INTEGER</span> <span class="kw">PRIMARY KEY AUTOINCREMENT</span>,
+    area_id     <span class="fn">INTEGER</span> <span class="kw">NOT NULL REFERENCES</span> parking_areas(area_id),
+    slot_number <span class="fn">TEXT</span>    <span class="kw">NOT NULL UNIQUE</span>,
+    slot_type   <span class="fn">TEXT</span>    <span class="kw">CHECK</span>(slot_type <span class="kw">IN</span> (<span class="str">'Two-Wheeler'</span>,<span class="str">'Four-Wheeler'</span>,<span class="str">'EV'</span>,<span class="str">'Heavy'</span>)),
+    status      <span class="fn">TEXT</span>    <span class="kw">DEFAULT</span> <span class="str">'AVAILABLE'</span>
+                        <span class="kw">CHECK</span>(status <span class="kw">IN</span> (<span class="str">'AVAILABLE'</span>,<span class="str">'OCCUPIED'</span>,<span class="str">'MAINTENANCE'</span>)),
+    floor_level <span class="fn">TEXT</span>    <span class="kw">DEFAULT</span> <span class="str">'G'</span>
+);
+
+<span class="cmt">-- Table 3: Vehicles</span>
+<span class="kw">CREATE TABLE</span> vehicles (
+    vehicle_id     <span class="fn">TEXT</span>    <span class="kw">PRIMARY KEY</span>,
+    license_plate  <span class="fn">TEXT</span>    <span class="kw">NOT NULL UNIQUE</span>,
+    vehicle_type   <span class="fn">TEXT</span>    <span class="kw">CHECK</span>(vehicle_type <span class="kw">IN</span> (<span class="str">'Two-Wheeler'</span>,<span class="str">'Four-Wheeler'</span>,<span class="str">'EV'</span>,<span class="str">'Heavy'</span>)),
+    owner_name     <span class="fn">TEXT</span>    <span class="kw">NOT NULL</span>,
+    contact_number <span class="fn">TEXT</span>,
+    registered_at  <span class="fn">DATETIME</span> <span class="kw">DEFAULT CURRENT_TIMESTAMP</span>
+);
+
+<span class="cmt">-- Table 4: Parking Tickets</span>
+<span class="kw">CREATE TABLE</span> parking_tickets (
+    ticket_id   <span class="fn">TEXT</span>     <span class="kw">PRIMARY KEY</span>,
+    vehicle_id  <span class="fn">TEXT</span>     <span class="kw">NOT NULL REFERENCES</span> vehicles(vehicle_id),
+    slot_id     <span class="fn">INTEGER</span>  <span class="kw">NOT NULL REFERENCES</span> parking_slots(slot_id),
+    entry_time  <span class="fn">DATETIME</span> <span class="kw">DEFAULT CURRENT_TIMESTAMP</span>,
+    exit_time   <span class="fn">DATETIME</span>,
+    fee_amount  <span class="fn">REAL</span>     <span class="kw">DEFAULT</span> <span class="str">0.0</span>,
+    status      <span class="fn">TEXT</span>     <span class="kw">DEFAULT</span> <span class="str">'ACTIVE'</span>
+                         <span class="kw">CHECK</span>(status <span class="kw">IN</span> (<span class="str">'ACTIVE'</span>,<span class="str">'PAID'</span>,<span class="str">'CANCELLED'</span>))
+);</pre></div>
+    <div class="result">
+      <p>▶ Output: Tables created successfully — 4 tables, 0 errors</p>
+      <table>
+        <thead><tr><th>Table Name</th><th>Columns</th><th>Primary Key</th><th>Foreign Keys</th></tr></thead>
+        <tbody>
+          <tr><td>parking_areas</td><td>5</td><td>area_id</td><td>None</td></tr>
+          <tr><td>parking_slots</td><td>6</td><td>slot_id</td><td>area_id → parking_areas</td></tr>
+          <tr><td>vehicles</td><td>6</td><td>vehicle_id</td><td>None</td></tr>
+          <tr><td>parking_tickets</td><td>7</td><td>ticket_id</td><td>vehicle_id → vehicles, slot_id → parking_slots</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Smart Parking Management System · Scenario 24 · 25ITC31 · Velalar College of Engineering and Technology · Madhan sree (732925ITR054)
+</footer>
+
+</body>
+</html>
