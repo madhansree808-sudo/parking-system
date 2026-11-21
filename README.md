@@ -26,6 +26,7 @@
 ---
 
 ### 🔗 Quick Access for Evaluators & Reviewers
+* 📘 **[Software Engineering Comprehensive Document (Units 1 - 5) (docs/SOFTWARE_ENGINEERING_DOCUMENT.md)](docs/SOFTWARE_ENGINEERING_DOCUMENT.md)**
 * 🗄️ **[View All Database Tables & Live Records (DATABASE_TABLES.md)](DATABASE_TABLES.md)**
 * 📋 **[View SQL Queries & Output Reference (sql_queries.html)](sql_queries.html)**
 * 🌐 **[Interactive Web Dashboard (index.html)](index.html)**
@@ -109,6 +110,7 @@ graph TD
 ```text
 d:\project 2\
 ├── docs\
+│   ├── SOFTWARE_ENGINEERING_DOCUMENT.md # Full Course Report (Units 1 to 5)
 │   ├── SRS.md                    # IEEE 830 Software Requirements Specification
 │   ├── DESIGN_DIAGRAMS.md        # UML Use Case, Class, Architecture, Sequence & State Diagrams
 │   ├── DATABASE_DESIGN.md        # ER Diagram, Relational Schema, 3NF/BCNF Normalization proofs
