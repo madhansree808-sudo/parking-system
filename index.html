@@ -283,46 +283,39 @@
 
   async function syncFromDatabase() {
     try {
-      const res = await fetch(`${API_URL}/api/data`);
+      const res = await fetch(`${API_URL}/api/slots`);
       if (res.ok) {
         const data = await res.json();
-        if (data && data.slots && data.slots.length > 0) {
+        if (Array.isArray(data) && data.length > 0) {
           isConnectedToDb = true;
           updateSyncBadge(true);
 
-          slots = data.slots.map(s => {
-            const cat = mapDbTypeToCategory(s.slot_type);
+          slots = data.map(s => {
+            const cat = mapDbTypeToCategory(s.slotType);
             const statusLower = s.status ? s.status.toLowerCase() : "available";
             let ticket = null;
-            if (statusLower === "occupied" && s.vehicle_number) {
+            if (statusLower === "occupied" && s.vehicleNumber) {
               ticket = {
-                ticketId: s.ticket_id || ("TKT-" + s.slot_id),
-                plate: s.vehicle_number,
-                owner: s.owner_name || "Authorized Driver",
-                entryTime: s.entry_time || "Recent"
+                ticketId: s.ticketId || ("TKT-" + s.slotId),
+                plate: s.vehicleNumber,
+                owner: s.ownerName || "Authorized Driver",
+                entryTime: s.entryTime || "Recent"
               };
             }
             return {
-              id: s.slot_id,
+              id: s.slotId,
               category: cat,
               status: statusLower,
               ticket: ticket
             };
           });
 
-          if (data.revenue && Array.isArray(data.revenue)) {
-            data.revenue.forEach(r => {
-              const cat = mapDbTypeToCategory(r.vehicle_type);
-              revenueByCategory[cat] = parseFloat(r.total_revenue_inr) || 0;
-            });
-          }
-
           renderAll();
           return;
         }
       }
     } catch (e) {
-      // Backend not running
+      // Backend not running — stay in offline localStorage mode
     }
     isConnectedToDb = false;
     updateSyncBadge(false);
@@ -600,18 +593,19 @@
       msg.style.color = "#3b82f6";
       msg.textContent = "⏳ Settle in progress... updating SQLite database...";
       try {
+        const plate = slot.ticket ? slot.ticket.plate : null;
+        const ticketId = slot.ticket ? slot.ticket.ticketId : null;
+        const body = ticketId ? { ticketId: String(ticketId) } : { plate: plate };
         const res = await fetch(`${API_URL}/api/exit`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            slotId: slotId,
-            durationHours: hours,
-            feeAmount: fee
-          })
+          body: JSON.stringify(body)
         });
         if (res.ok) {
+          const result = await res.json();
+          const actualFee = result.feeAmount ? result.feeAmount.toFixed(2) : fee.toFixed(2);
           msg.style.color = "#16a34a";
-          msg.textContent = `✅ ${exitedPlate} exited ${slotId}. Fee: ₹${fee.toFixed(2)} — SQLite Database & Terminal Updated!`;
+          msg.textContent = `✅ ${exitedPlate} exited ${slotId}. Fee: ₹${actualFee} — SQLite Database & Terminal Updated!`;
           await syncFromDatabase();
           return;
         }
@@ -649,8 +643,9 @@
     }
   }
 
-  // Initialize
+  // Initialize and auto-refresh every 3 seconds
   syncFromDatabase();
+  setInterval(syncFromDatabase, 3000);
 </script>
 </body>
 </html>

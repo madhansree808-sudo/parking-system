@@ -7,6 +7,7 @@ import com.smartparking.model.ParkingSlot;
 import com.smartparking.model.ParkingTicket;
 import com.smartparking.model.Vehicle;
 import com.smartparking.model.VehicleType;
+import com.smartparking.server.ParkingWebServer;
 import com.smartparking.service.FeeCalculator;
 import com.smartparking.service.ParkingService;
 import com.smartparking.util.ConsoleTable;
@@ -33,6 +34,9 @@ public class Main {
     public static void main(String[] args) {
         // Initialize SQLite database schema and seeds
         DBConnection.initializeDatabase();
+
+        // Auto-start the Java HTTP server in background (port 8080)
+        ParkingWebServer.startInBackground();
 
         printWelcomeHeader();
 
