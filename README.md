@@ -25,6 +25,17 @@
 
 ---
 
+### 🔗 Quick Access for Evaluators & Reviewers
+* 🗄️ **[View All Database Tables & Live Records (DATABASE_TABLES.md)](DATABASE_TABLES.md)**
+* 📋 **[View SQL Queries & Output Reference (sql_queries.html)](sql_queries.html)**
+* 🌐 **[Interactive Web Dashboard (index.html)](index.html)**
+* 📑 **[Software Requirements Specification (docs/SRS.md)](docs/SRS.md)**
+* 📐 **[UML Diagrams & Architecture (docs/DESIGN_DIAGRAMS.md)](docs/DESIGN_DIAGRAMS.md)**
+* 🗃️ **[Database Normalization & ER Schema (docs/DATABASE_DESIGN.md)](docs/DATABASE_DESIGN.md)**
+* 🧪 **[Test Plan & RTM Matrix (docs/TESTING_DOCUMENT.md)](docs/TESTING_DOCUMENT.md)**
+
+---
+
 ## 🎯 Problem Statement (Scenario 24)
 Parking facilities in shopping malls, hospitals, educational institutions, commercial offices, and public transit terminals require an efficient mechanism to manage parking slots, record vehicle ingress and egress, compute transparent parking fees, and prevent congestion. Manual parking logbooks result in slot allocation errors, lack of real-time occupancy visibility, revenue leakage, and severe delays during peak traffic hours.
 
