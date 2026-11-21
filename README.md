@@ -146,6 +146,14 @@ d:\project 2\
 │       ├── peak_parking_hours.png
 │       ├── revenue_by_vehicle_type.png
 │       └── parking_duration_boxplot.png
+├── web\                          # Web Application Assets
+│   ├── css\style.css
+│   ├── js\app.js
+│   ├── images\
+│   ├── index.html
+│   └── sql_queries.html
+├── index.html                    # Real-Time Interactive Web Dashboard (Chart.js)
+├── sql_queries.html              # Comprehensive SQL Queries & Output Reference
 └── README.md                     # Master Project Documentation
 ```
 
