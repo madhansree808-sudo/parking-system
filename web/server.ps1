@@ -215,6 +215,7 @@ ORDER BY s.slot_id;
             $owner = ($data.ownerName -replace "'", "''").Trim()
             $phone = ($data.ownerPhone -replace "'", "''").Trim()
             $slotId = ($data.slotId -replace "'", "''").Trim()
+            $now = [DateTime]::Now.ToString("yyyy-MM-dd HH:mm:ss")
 
             # Execute transaction in SQLite
             $sql = @"
@@ -225,7 +226,7 @@ VALUES ('$plate', '$type', '$owner', '$phone');
 UPDATE parking_slots SET status = 'OCCUPIED' WHERE slot_id = '$slotId';
 
 INSERT INTO parking_tickets (vehicle_number, slot_id, entry_time, payment_status)
-VALUES ('$plate', '$slotId', datetime('now', 'localtime'), 'PENDING');
+VALUES ('$plate', '$slotId', '$now', 'PENDING');
 COMMIT;
 "@
             $rc = [SqliteServerHelper]::ExecuteNonQuery($dbPath, $sql)
@@ -233,7 +234,7 @@ COMMIT;
                 Write-Host "[+] Vehicle Parked: $plate in slot $slotId ($type) - DB Updated!" -ForegroundColor Green
                 Send-JsonResponse $response 200 "{`"success`":true,`"plate`":`"$plate`",`"slotId`":`"$slotId`"}"
             } else {
-                Write-Host "[-] Failed to park vehicle $plate in slot $slotId" -ForegroundColor Red
+                Write-Host "[-] Failed to park vehicle $plate in slot $slotId (rc=$rc)" -ForegroundColor Red
                 Send-JsonResponse $response 500 "{`"success`":false,`"error`":`"Database transaction failed`"}"
             }
             continue
@@ -248,11 +249,12 @@ COMMIT;
             $slotId = ($data.slotId -replace "'", "''").Trim()
             $hours = [double]$data.durationHours
             $fee = [double]$data.feeAmount
+            $now = [DateTime]::Now.ToString("yyyy-MM-dd HH:mm:ss")
 
             $sql = @"
 BEGIN TRANSACTION;
 UPDATE parking_tickets 
-SET exit_time = datetime('now', 'localtime'),
+SET exit_time = '$now',
     parking_duration_hours = $hours,
     fee_amount = $fee,
     payment_status = 'PAID'
@@ -263,10 +265,10 @@ COMMIT;
 "@
             $rc = [SqliteServerHelper]::ExecuteNonQuery($dbPath, $sql)
             if ($rc -eq 0) {
-                Write-Host "[+] Vehicle Exited from $slotId: Stay=$hours hrs, Fee=Rs. $fee - DB Updated!" -ForegroundColor Green
+                Write-Host "[+] Vehicle Exited from ${slotId} - Stay=${hours} hrs, Fee=Rs. ${fee} - DB Updated!" -ForegroundColor Green
                 Send-JsonResponse $response 200 "{`"success`":true,`"slotId`":`"$slotId`",`"fee`":$fee}"
             } else {
-                Write-Host "[-] Failed to settle exit for slot $slotId" -ForegroundColor Red
+                Write-Host "[-] Failed to settle exit for slot $slotId (rc=$rc)" -ForegroundColor Red
                 Send-JsonResponse $response 500 "{`"success`":false,`"error`":`"Database update failed`"}"
             }
             continue
