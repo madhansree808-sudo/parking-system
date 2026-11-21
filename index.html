@@ -55,6 +55,9 @@
     <h1>Velalar College of Engineering and Technology (Autonomous)</h1>
     <p>Department of Information Technology • Scenario 24: Smart Parking Management &amp; Usage Analysis System</p>
     <div class="student-info">👤 Madhan sree | Roll: 732925ITR054 | Reg No: 54 | Class: 25IT3A</div>
+    <div style="margin-top: 5px;">
+      <span id="syncBadge" style="background: #059669; color: #fff; padding: 3px 10px; border-radius: 12px; font-size: 0.76rem; font-weight: 600; display: inline-block;">🟢 Live Database Sync: Checking...</span>
+    </div>
   </div>
   <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
     <a href="docs/SOFTWARE_ENGINEERING_DOCUMENT.md" style="background: #3b82f6; color: #fff; text-decoration: none; padding: 8px 14px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; display: inline-block;">📘 SE Units 1-5 Doc</a>
@@ -170,38 +173,73 @@
 </div>
 
 <script>
+  const API_URL = (window.location.protocol === "http:" || window.location.protocol === "https:") && window.location.port === "8080"
+    ? ""
+    : "http://localhost:8080";
+
+  let isConnectedToDb = false;
+
   const TARIFF = {
-    "Two-Wheeler":  { base: 20, extra: 10 },
-    "Four-Wheeler": { base: 40, extra: 20 },
-    "EV":           { base: 50, extra: 25 },
-    "Heavy":        { base: 80, extra: 40 }
+    "Two-Wheeler":  { base: 20, extra: 10, dbType: "TWO_WHEELER" },
+    "Four-Wheeler": { base: 40, extra: 20, dbType: "FOUR_WHEELER" },
+    "EV":           { base: 50, extra: 25, dbType: "EV" },
+    "Heavy":        { base: 80, extra: 40, dbType: "HEAVY_VEHICLE" }
   };
 
   function createDefaultSlots() {
-    const slots = [];
-    for (let i = 1; i <= 40; i++) {
-      let category = "Four-Wheeler";
-      if (i <= 10) category = "Two-Wheeler";
-      else if (i <= 30) category = "Four-Wheeler";
-      else if (i <= 36) category = "EV";
-      else category = "Heavy";
+    return [
+      { id: "A-TW-01", category: "Two-Wheeler", status: "occupied", ticket: { ticketId: "1033", plate: "TN-33-AB-1001", owner: "Karthik Raja", entryTime: "08:30:00" } },
+      { id: "A-TW-02", category: "Two-Wheeler", status: "occupied", ticket: { ticketId: "1034", plate: "TN-33-BC-2002", owner: "Suresh Kumar", entryTime: "08:45:00" } },
+      { id: "A-TW-03", category: "Two-Wheeler", status: "available", ticket: null },
+      { id: "A-TW-04", category: "Two-Wheeler", status: "available", ticket: null },
+      { id: "A-FW-01", category: "Four-Wheeler", status: "occupied", ticket: { ticketId: "1035", plate: "TN-33-FG-6006", owner: "Madhan sree", entryTime: "09:00:00" } },
+      { id: "A-FW-02", category: "Four-Wheeler", status: "occupied", ticket: { ticketId: "1036", plate: "TN-33-GH-7007", owner: "Venkatesh S", entryTime: "09:15:00" } },
+      { id: "A-FW-03", category: "Four-Wheeler", status: "available", ticket: null },
+      { id: "A-FW-04", category: "Four-Wheeler", status: "available", ticket: null },
+      { id: "A-FW-05", category: "Four-Wheeler", status: "available", ticket: null },
+      { id: "A-FW-06", category: "Four-Wheeler", status: "available", ticket: null },
+      { id: "A-HV-01", category: "Heavy", status: "occupied", ticket: { ticketId: "1037", plate: "TN-33-WX-2020", owner: "GreenLine Logistics", entryTime: "09:30:00" } },
+      { id: "A-HV-02", category: "Heavy", status: "available", ticket: null },
 
-      slots.push({
-        id: "S-" + String(i).padStart(2, "0"),
-        category: category,
-        status: i === 40 ? "maintenance" : "available",
-        ticket: null
-      });
-    }
-    return slots;
+      { id: "B-FW-01", category: "Four-Wheeler", status: "occupied", ticket: { ticketId: "1038", plate: "TN-33-HJ-8008", owner: "Naveen Prashanth", entryTime: "09:45:00" } },
+      { id: "B-FW-02", category: "Four-Wheeler", status: "occupied", ticket: { ticketId: "1039", plate: "TN-33-JK-9009", owner: "Deepak Nathan", entryTime: "10:00:00" } },
+      { id: "B-FW-03", category: "Four-Wheeler", status: "available", ticket: null },
+      { id: "B-FW-04", category: "Four-Wheeler", status: "available", ticket: null },
+      { id: "B-FW-05", category: "Four-Wheeler", status: "available", ticket: null },
+      { id: "B-TW-01", category: "Two-Wheeler", status: "available", ticket: null },
+      { id: "B-TW-02", category: "Two-Wheeler", status: "available", ticket: null },
+      { id: "B-TW-03", category: "Two-Wheeler", status: "available", ticket: null },
+      { id: "B-TW-04", category: "Two-Wheeler", status: "available", ticket: null },
+      { id: "B-TW-05", category: "Two-Wheeler", status: "maintenance", ticket: null },
+
+      { id: "C-FW-01", category: "Four-Wheeler", status: "available", ticket: null },
+      { id: "C-FW-02", category: "Four-Wheeler", status: "available", ticket: null },
+      { id: "C-FW-03", category: "Four-Wheeler", status: "occupied", ticket: { ticketId: "1040", plate: "TN-40-DD-4141", owner: "Senthil Nathan", entryTime: "10:10:00" } },
+      { id: "C-FW-04", category: "Four-Wheeler", status: "available", ticket: null },
+      { id: "C-FW-05", category: "Four-Wheeler", status: "available", ticket: null },
+      { id: "C-HV-01", category: "Heavy", status: "available", ticket: null },
+      { id: "C-HV-02", category: "Heavy", status: "available", ticket: null },
+      { id: "C-HV-03", category: "Heavy", status: "available", ticket: null },
+      { id: "C-TW-01", category: "Two-Wheeler", status: "available", ticket: null },
+      { id: "C-TW-02", category: "Two-Wheeler", status: "available", ticket: null },
+
+      { id: "D-EV-01", category: "EV", status: "occupied", ticket: { ticketId: "1041", plate: "TN-33-ST-1616", owner: "Arunachalam M", entryTime: "10:15:00" } },
+      { id: "D-EV-02", category: "EV", status: "occupied", ticket: { ticketId: "1042", plate: "TN-33-TU-1717", owner: "Lavanya Ramesh", entryTime: "10:20:00" } },
+      { id: "D-EV-03", category: "EV", status: "available", ticket: null },
+      { id: "D-EV-04", category: "EV", status: "available", ticket: null },
+      { id: "D-FW-01", category: "Four-Wheeler", status: "available", ticket: null },
+      { id: "D-FW-02", category: "Four-Wheeler", status: "available", ticket: null },
+      { id: "D-FW-03", category: "Four-Wheeler", status: "available", ticket: null },
+      { id: "D-FW-04", category: "Four-Wheeler", status: "available", ticket: null }
+    ];
   }
 
-  let slots = JSON.parse(localStorage.getItem("parking_slots")) || createDefaultSlots();
-  let revenueByCategory = JSON.parse(localStorage.getItem("parking_rev_cat")) || {
-    "Two-Wheeler": 320,
-    "Four-Wheeler": 1440,
-    "EV": 500,
-    "Heavy": 422.5
+  let slots = JSON.parse(localStorage.getItem("parking_slots_db")) || createDefaultSlots();
+  let revenueByCategory = JSON.parse(localStorage.getItem("parking_rev_cat_db")) || {
+    "Two-Wheeler": 200,
+    "Four-Wheeler": 1020,
+    "EV": 362.5,
+    "Heavy": 840
   };
 
   let statusChartInstance = null;
@@ -209,9 +247,91 @@
   let revenueChartInstance = null;
   let trafficChartInstance = null;
 
+  function updateSyncBadge(connected) {
+    const badge = document.getElementById("syncBadge");
+    if (!badge) return;
+    if (connected) {
+      badge.style.background = "#059669";
+      badge.innerHTML = "🟢 Live Database Sync: ACTIVE (SQLite: parking_system.db)";
+      badge.title = "Connected to local REST backend. Changes update the SQLite database directly!";
+    } else {
+      badge.style.background = "#d97706";
+      badge.innerHTML = "🟡 Local Browser Mode (Run 'start_server.bat' for live terminal sync)";
+      badge.title = "Local offline mode. Start server.ps1 or start_server.bat to sync with terminal tables.";
+    }
+  }
+
+  function mapDbTypeToCategory(dbType) {
+    switch (dbType) {
+      case "TWO_WHEELER": return "Two-Wheeler";
+      case "FOUR_WHEELER": return "Four-Wheeler";
+      case "EV": return "EV";
+      case "HEAVY_VEHICLE": return "Heavy";
+      default: return "Four-Wheeler";
+    }
+  }
+
+  function mapCategoryToDbType(cat) {
+    switch (cat) {
+      case "Two-Wheeler": return "TWO_WHEELER";
+      case "Four-Wheeler": return "FOUR_WHEELER";
+      case "EV": return "EV";
+      case "Heavy": return "HEAVY_VEHICLE";
+      default: return "FOUR_WHEELER";
+    }
+  }
+
+  async function syncFromDatabase() {
+    try {
+      const res = await fetch(`${API_URL}/api/data`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.slots && data.slots.length > 0) {
+          isConnectedToDb = true;
+          updateSyncBadge(true);
+
+          slots = data.slots.map(s => {
+            const cat = mapDbTypeToCategory(s.slot_type);
+            const statusLower = s.status ? s.status.toLowerCase() : "available";
+            let ticket = null;
+            if (statusLower === "occupied" && s.vehicle_number) {
+              ticket = {
+                ticketId: s.ticket_id || ("TKT-" + s.slot_id),
+                plate: s.vehicle_number,
+                owner: s.owner_name || "Authorized Driver",
+                entryTime: s.entry_time || "Recent"
+              };
+            }
+            return {
+              id: s.slot_id,
+              category: cat,
+              status: statusLower,
+              ticket: ticket
+            };
+          });
+
+          if (data.revenue && Array.isArray(data.revenue)) {
+            data.revenue.forEach(r => {
+              const cat = mapDbTypeToCategory(r.vehicle_type);
+              revenueByCategory[cat] = parseFloat(r.total_revenue_inr) || 0;
+            });
+          }
+
+          renderAll();
+          return;
+        }
+      }
+    } catch (e) {
+      // Backend not running
+    }
+    isConnectedToDb = false;
+    updateSyncBadge(false);
+    renderAll();
+  }
+
   function saveState() {
-    localStorage.setItem("parking_slots", JSON.stringify(slots));
-    localStorage.setItem("parking_rev_cat", JSON.stringify(revenueByCategory));
+    localStorage.setItem("parking_slots_db", JSON.stringify(slots));
+    localStorage.setItem("parking_rev_cat_db", JSON.stringify(revenueByCategory));
   }
 
   function renderCharts(occupied, available, maintenance) {
@@ -315,7 +435,7 @@
       div.innerHTML = `
         ${slot.id}
         <small>${slot.category}</small>
-        <small>${slot.status === "occupied" ? slot.ticket.plate : slot.status.toUpperCase()}</small>
+        <small>${slot.status === "occupied" && slot.ticket ? slot.ticket.plate : slot.status.toUpperCase()}</small>
       `;
 
       div.onclick = () => {
@@ -324,7 +444,10 @@
           populateAvailableSlots();
           document.getElementById("slotSelect").value = slot.id;
         } else if (slot.status === "occupied") {
-          alert(`Slot ${slot.id} is OCCUPIED by ${slot.ticket.plate} (${slot.ticket.owner}). Use Egress Terminal to release.`);
+          const p = slot.ticket ? slot.ticket.plate : "Vehicle";
+          const o = slot.ticket ? slot.ticket.owner : "Driver";
+          alert(`Slot ${slot.id} is OCCUPIED by ${p} (${o}). Select it in Egress Terminal to release.`);
+          document.getElementById("exitSelect").value = slot.id;
         } else {
           alert(`Slot ${slot.id} is under MAINTENANCE.`);
         }
@@ -388,10 +511,11 @@
     });
   }
 
-  document.getElementById("parkForm").addEventListener("submit", function(e) {
+  document.getElementById("parkForm").addEventListener("submit", async function(e) {
     e.preventDefault();
     const plate = document.getElementById("plateInput").value.trim().toUpperCase();
     const owner = document.getElementById("ownerInput").value.trim();
+    const selectedType = document.getElementById("typeInput").value;
     const slotId = document.getElementById("slotSelect").value;
     const msg = document.getElementById("parkMsg");
 
@@ -402,13 +526,41 @@
       return;
     }
 
-    const alreadyParked = slots.some(s => s.status === "occupied" && s.ticket.plate === plate);
+    const alreadyParked = slots.some(s => s.status === "occupied" && s.ticket && s.ticket.plate === plate);
     if (alreadyParked) {
       msg.style.color = "#dc2626";
       msg.textContent = `❌ Vehicle ${plate} is already parked!`;
       return;
     }
 
+    if (isConnectedToDb) {
+      msg.style.color = "#3b82f6";
+      msg.textContent = "⏳ Updating SQLite database...";
+      try {
+        const res = await fetch(`${API_URL}/api/park`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            plate: plate,
+            vehicleType: mapCategoryToDbType(selectedType),
+            ownerName: owner,
+            ownerPhone: "9842111054",
+            slotId: slotId
+          })
+        });
+        if (res.ok) {
+          msg.style.color = "#16a34a";
+          msg.textContent = `✅ Parked ${plate} in ${slotId} — SQLite Database & Terminal Updated!`;
+          this.reset();
+          await syncFromDatabase();
+          return;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Client-side fallback
     slot.status = "occupied";
     slot.ticket = {
       ticketId: "TKT-" + Math.floor(1000 + Math.random() * 9000),
@@ -423,7 +575,7 @@
     renderAll();
   });
 
-  document.getElementById("exitForm").addEventListener("submit", function(e) {
+  document.getElementById("exitForm").addEventListener("submit", async function(e) {
     e.preventDefault();
     const slotId = document.getElementById("exitSelect").value;
     const hours = parseFloat(document.getElementById("hoursInput").value);
@@ -442,7 +594,33 @@
       fee = hours <= 2 ? rate.base : rate.base + Math.ceil(hours - 2) * rate.extra;
     }
 
-    const exitedPlate = slot.ticket.plate;
+    const exitedPlate = slot.ticket ? slot.ticket.plate : "Vehicle";
+
+    if (isConnectedToDb) {
+      msg.style.color = "#3b82f6";
+      msg.textContent = "⏳ Settle in progress... updating SQLite database...";
+      try {
+        const res = await fetch(`${API_URL}/api/exit`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            slotId: slotId,
+            durationHours: hours,
+            feeAmount: fee
+          })
+        });
+        if (res.ok) {
+          msg.style.color = "#16a34a";
+          msg.textContent = `✅ ${exitedPlate} exited ${slotId}. Fee: ₹${fee.toFixed(2)} — SQLite Database & Terminal Updated!`;
+          await syncFromDatabase();
+          return;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Client-side fallback
     revenueByCategory[slot.category] = (revenueByCategory[slot.category] || 0) + fee;
     slot.status = "available";
     slot.ticket = null;
@@ -452,17 +630,27 @@
     renderAll();
   });
 
-  function resetSystem() {
-    localStorage.removeItem("parking_slots");
-    localStorage.removeItem("parking_rev_cat");
-    slots = createDefaultSlots();
-    revenueByCategory = { "Two-Wheeler": 0, "Four-Wheeler": 0, "EV": 0, "Heavy": 0 };
-    document.getElementById("parkMsg").textContent = "";
-    document.getElementById("exitMsg").textContent = "";
-    renderAll();
+  async function resetSystem() {
+    if (confirm("Reset parking system and reload demo dataset?")) {
+      if (isConnectedToDb) {
+        try {
+          await fetch(`${API_URL}/api/reset`, { method: "POST" });
+          await syncFromDatabase();
+          return;
+        } catch (e) {}
+      }
+      localStorage.removeItem("parking_slots_db");
+      localStorage.removeItem("parking_rev_cat_db");
+      slots = createDefaultSlots();
+      revenueByCategory = { "Two-Wheeler": 200, "Four-Wheeler": 1020, "EV": 362.5, "Heavy": 840 };
+      document.getElementById("parkMsg").textContent = "";
+      document.getElementById("exitMsg").textContent = "";
+      renderAll();
+    }
   }
 
-  renderAll();
+  // Initialize
+  syncFromDatabase();
 </script>
 </body>
 </html>

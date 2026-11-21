@@ -37,6 +37,13 @@
 
 ---
 
+### 🔄 Live Synchronization: Website ↔ Terminal Database Tables
+1. **Launch Full-Stack Server**: Double-click `start_server.bat` (or run `powershell -ExecutionPolicy Bypass -File server.ps1`).
+2. **Interact on Website**: Open `http://localhost:8080/`. When you park a vehicle or settle an exit, it executes live atomic SQL transactions directly into `database/parking_system.db`.
+3. **Display in Terminal**: In your PowerShell window, run `.\run_tables.bat` (or `powershell -ExecutionPolicy Bypass -File .\show_database_tables.ps1`). The terminal tables will instantly reflect the newly parked vehicle, updated slot status (`OCCUPIED`/`AVAILABLE`), and updated revenue!
+
+---
+
 ## 🎯 Problem Statement (Scenario 24)
 Parking facilities in shopping malls, hospitals, educational institutions, commercial offices, and public transit terminals require an efficient mechanism to manage parking slots, record vehicle ingress and egress, compute transparent parking fees, and prevent congestion. Manual parking logbooks result in slot allocation errors, lack of real-time occupancy visibility, revenue leakage, and severe delays during peak traffic hours.
 
